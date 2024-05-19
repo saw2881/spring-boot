@@ -40,17 +40,6 @@ public class SecurityConfiguration {
         .build();
     }
 
-    // @Bean
-    // @Order(1)
-    // public SecurityFilterChain jdbcFilterChain(HttpSecurity httpSecurity) throws Exception {
-    //     return httpSecurity.authorizeHttpRequests(requestMatcher -> {
-    //        requestMatcher.requestMatchers("/jdbc/**")
-    //        .authenticated();
-    //     }).authenticationManager(new JdbcAuthenticationManager())
-    //     // .httpBasic(t ->  {})
-    //     .build();
-    // }
-
     @Bean
     public UserDetailsService getUserDetailsService(){
          return username -> User.builder()
