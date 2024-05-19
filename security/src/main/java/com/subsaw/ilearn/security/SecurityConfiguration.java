@@ -31,6 +31,7 @@ public class SecurityConfiguration {
         return httpSecurity.authorizeHttpRequests(requestMatcher -> {
             requestMatcher.requestMatchers(HttpMethod.POST,"/account/token").permitAll();
            requestMatcher.requestMatchers("/public/**").permitAll();
+           requestMatcher.requestMatchers("**").authenticated();
         })
         .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
         .httpBasic(t-> {})

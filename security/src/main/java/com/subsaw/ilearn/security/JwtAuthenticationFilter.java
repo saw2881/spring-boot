@@ -28,12 +28,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         
         String authHeader = request.getHeader(AUTHORIZATION_HEADER_NAME);
-        if (authHeader == null) {
+        if (authHeader == null || !authHeader.startsWith(BEARER_TOKEN)) {
             filterChain.doFilter(request, response);
         }
-
-        if(authHeader.isBlank() || authHeader.substring(BEARER_TOKEN.length()).isBlank() || !jwtUtil.validateToken(authHeader.substring(BEARER_TOKEN.length()))) {
-            throw new AccessDeniedException("Invalid token");
+        else {
+            if(authHeader.isBlank() || authHeader.substring(BEARER_TOKEN.length()).isBlank() || !jwtUtil.validateToken(authHeader.substring(BEARER_TOKEN.length()))) {
+                throw new AccessDeniedException("Invalid token");
+            }
         }
     }
     
