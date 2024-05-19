@@ -22,13 +22,13 @@ public class UserRole {
     @Id
     @SequenceGenerator(allocationSize = 1, sequenceName = "seq_userrole_id", name="seq_userrole_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_userrole_id")
-    private long UserRoleId;
+    private long userRoleId;
 
     private String role;
     private String desciption;
 
     @ManyToOne
-    @JoinColumn(name = "userid")
+    @JoinColumn(name = "user_id")
     private User user;
     
 }
