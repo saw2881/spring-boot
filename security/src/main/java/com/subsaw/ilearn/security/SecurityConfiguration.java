@@ -1,23 +1,24 @@
 package com.subsaw.ilearn.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import com.subsaw.ilearn.security.repository.UserRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -25,6 +26,9 @@ public class SecurityConfiguration {
     
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Bean
     public SecurityFilterChain publicFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -59,6 +63,25 @@ public class SecurityConfiguration {
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "com.subsaw.ilearn.db.seed", havingValue = "true")
+    public CommandLineRunner seedData(PasswordEncoder passwordEncoder) {
+        return args -> {
+            // if there is data, don't bother
+            if (userRepository.count() > 0) 
+                return;
+            
+            var user = com.subsaw.ilearn.security.entity.User.builder()
+            .firstName("John")
+            .lastName("Doe")
+            .username("john.doe")
+            .password(passwordEncoder.encode("p@$$w0rd"))
+            .build();
+
+            userRepository.save(user);
+        } ;
     }
 }
