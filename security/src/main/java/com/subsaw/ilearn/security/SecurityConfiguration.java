@@ -1,5 +1,7 @@
 package com.subsaw.ilearn.security;
 
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -11,6 +13,8 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -46,11 +50,24 @@ public class SecurityConfiguration {
 
     @Bean
     public UserDetailsService getUserDetailsService(){
-         return username -> User.builder()
-         .username(username)
-         .password(username)
-         .authorities("bar")
-         .build();
+
+        return username ->  {
+            var usersList = userRepository.findByUsername(username);
+
+            if(usersList.size() == 0)
+                return null;
+
+            else {
+                var user = usersList.get(0);
+                return User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .authorities(user.getRoles().stream().map(role -> 
+                        new SimpleGrantedAuthority(role.getRole()))
+                        .collect(Collectors.toList()))
+                .build();
+            }
+         };
     }
 
     @Bean
