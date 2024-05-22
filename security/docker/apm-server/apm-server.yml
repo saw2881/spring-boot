@@ -1,0 +1,26 @@
+apm-server:
+  host: "0.0.0.0:8200"
+  rum:
+    enabled: false
+  kibana:
+    enabled: true
+    host: "http://kibana:5601"
+    username: elastic
+    password: test@123
+
+output.elasticsearch:
+  hosts: ["https://elasticsearch:9200"]
+  username: elastic
+  password: test@123
+  ssl.certificate_authorities: ["/usr/share/apm-server/config/certs/ca/ca.crt"] 
+  # ssl.certificate: "/etc/pki/client/cert.pem"
+  # ssl.key: "/etc/pki/client/cert.key"
+  index: "apm-%{[{beat.version}]}-%{+yyyy.MM.dd}"
+
+setup:
+  kibana:
+    host: "http://kibana:5601"
+  dashboards:
+    enabled: true
+  template:
+    enabled: true
